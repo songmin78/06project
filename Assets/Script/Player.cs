@@ -1,19 +1,29 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class Player : MonoBehaviour
 {
+    [Header("일반공격")]
     [SerializeField] GameObject arrow;
+    [SerializeField] GameObject sword;
+    [SerializeField] GameObject magic;
+
+    [Header("카운터 공격")]
+    [SerializeField] GameObject ctArrow;
+    [SerializeField] GameObject ctSword;
+    [SerializeField] GameObject ctMagic;
+
+    [Header("기타")]
     [SerializeField] float horizontals;
     [SerializeField] float verticals;
-    [SerializeField] bool Stopcheck = false;
     private float MaxHP;
 
 
     [Header("플레이어 정보")]
     [SerializeField] float playerspeed = 5f;//플레이어가 이동하는 속도
-    [SerializeField] int Weapontype;//무기 리스트
+    [SerializeField] public int Weapontype;//무기 리스트
 
     [Header("플레이어의 능력치 설정")]
     [SerializeField,Range(1,5)] float GameHP;//게임내 플레이어 체력
@@ -54,7 +64,6 @@ public class Player : MonoBehaviour
             horizontals = 0;
         }
         transform.position += new Vector3(horizontals * playerspeed, verticals * playerspeed, 0) * Time.deltaTime;
-
     }
     private void Anim()
     {
@@ -71,41 +80,40 @@ public class Player : MonoBehaviour
     {
         if(Input.GetKeyDown(KeyCode.K))//일반 공격
         {
+            GameObject go = null;
             if(Weapontype == 0)//원거리(활)일경우
             {
-                GameObject bow = Instantiate(arrow);
-                Weaponcheck weaponcheck = bow.GetComponent<Weaponcheck>();
-                weaponcheck.Attackdamage();
-
-                Debug.Log("원거리");
+                go = Instantiate(arrow);
             }
             else if(Weapontype == 1)//근접일 경우
             {
-                Debug.Log("근거리");
+                go = Instantiate(sword);
             }
             else if(Weapontype == 2)//마법공격일 경우
             {
-                Debug.Log("마법");
+                go = Instantiate(magic);
             }
+            Weaponcheck weaponcheck = go.GetComponent<Weaponcheck>();
+            weaponcheck.Attackdamage(Weapontype);
         }
+
         if(Input.GetKeyDown(KeyCode.L))//카운터 공격
         {
+            GameObject count = null;
             if (Weapontype == 0)//원거리(활)일경우
             {
-                GameObject bow = Instantiate(arrow);
-                Weaponcheck weaponcheck = bow.GetComponent<Weaponcheck>();
-                weaponcheck.Counterdamage();
-
-                Debug.Log("원거리 카운터");
+                count = Instantiate(arrow);
             }
             else if (Weapontype == 1)//근접일 경우
             {
-                Debug.Log("근접카운터");
+                count = Instantiate(sword);
             }
             else if (Weapontype == 2)//마법공격일 경우
             {
-                Debug.Log("마법카운터");
+                count  = Instantiate(magic);
             }
+            Weaponcheck weaponcheck = count.GetComponent<Weaponcheck>();
+            weaponcheck.Counterdamage(Weapontype);
         }
     }
 
@@ -122,6 +130,10 @@ public class Player : MonoBehaviour
                 Weapontype = 2;
             }
             else if(Weapontype == 2)//원거리 마법무기 => 2
+            {
+                Weapontype = 0;
+            }
+            else
             {
                 Weapontype = 0;
             }
